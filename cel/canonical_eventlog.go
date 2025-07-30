@@ -11,7 +11,8 @@ import (
 
 	"github.com/google/go-configfs-tsm/configfs/configfsi"
 	"github.com/google/go-eventlog/register"
-	"github.com/google/go-tdx-guest/rtmr"
+	tg "github.com/google/go-tdx-guest/client"
+	tpmclient "github.com/google/go-tpm-tools/client"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
 )
@@ -151,10 +152,20 @@ func (c *CEL) AppendEventRTMR(client configfsi.Client, rtmrIndex int, event Cont
 		return err
 	}
 
-	err = rtmr.ExtendDigestClient(client, rtmrIndex, digestsMap[crypto.SHA384])
+	device, err := tpmclient.CreateTdxDevice()
+	if err != nil {
+		return nil
+	}
+
+	err = tg.ExtendRtmrDigest(device.Device, rtmrIndex, digestsMap[crypto.SHA384])
 	if err != nil {
 		return err
 	}
+
+	// err = rtmr.ExtendDigestClient(client, rtmrIndex, digestsMap[crypto.SHA384])
+	// if err != nil {
+	// 	return err
+	// }
 
 	celrRTMR := Record{
 		RecNum:    uint64(len(c.Records)),

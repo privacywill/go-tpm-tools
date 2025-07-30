@@ -35,3 +35,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241021214115-324edc3d5d38 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
 )
+
+replace github.com/google/go-tdx-guest => github.com/privacywill/go-tdx-guest v0.0.0-20250730062647-84450c9a27bb

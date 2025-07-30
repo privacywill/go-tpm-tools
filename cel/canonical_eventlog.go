@@ -8,10 +8,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/google/go-configfs-tsm/configfs/configfsi"
 	"github.com/google/go-eventlog/register"
-	"github.com/google/go-tdx-guest/rtmr"
 	"github.com/google/go-tpm/legacy/tpm2"
 	"github.com/google/go-tpm/tpmutil"
 )
@@ -151,7 +151,18 @@ func (c *CEL) AppendEventRTMR(client configfsi.Client, rtmrIndex int, event Cont
 		return err
 	}
 
-	err = rtmr.ExtendDigestClient(client, rtmrIndex, digestsMap[crypto.SHA384])
+	// err = rtmr.ExtendDigestClient(client, rtmrIndex, digestsMap[crypto.SHA384])
+	// if err != nil {
+	// 	return err
+	// }
+	rtmr3File := "/sys/class/misc/tdx_guest/measurements/rtmr3:sha384"
+	rtmr, err := os.OpenFile(rtmr3File, os.O_WRONLY, 0)
+	if err != nil {
+		return err
+	}
+	defer rtmr.Close()
+
+	_, err = rtmr.Write(digestsMap[crypto.SHA384])
 	if err != nil {
 		return err
 	}
